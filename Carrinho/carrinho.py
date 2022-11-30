@@ -19,14 +19,16 @@ conexao.commit()
 conexao.rollback()
 
 '''
+
 from flask import Flask, redirect, url_for, request, render_template
 import sqlite3 as sql
-banco = 'cart.db'
+banco = 'bcarrinho.db'
 
 app = Flask(__name__)
 
-conexao = sql.connect(banco)
-cursor = conexao.cursor()
+def abrir_conexao(banco):
+    conexao = sql.connect(banco)
+    cursor = conexao.cursor()
 
 def fechar_conexao(conexao):
     conexao.commit()
@@ -34,7 +36,7 @@ def fechar_conexao(conexao):
 
 # Comandos SQL
 contagem = "SELECT COUNT(*) FROM carrinho;"
-cria_table = "CREATE TABLE IF NOT EXISTS carrinho (id_prod INTEGER PRIMARY KEY, Nome TEXT NOT NULL, Preço REAL NOT NULL, Quantidade INTEGER NOT NULL, Descrição TEXT NOT NULL);"
+criar_table = "CREATE TABLE IF NOT EXISTS carrinho (id_prod INTEGER PRIMARY KEY, Nome TEXT NOT NULL, Preço REAL NOT NULL, Quantidade INTEGER NOT NULL, Descrição TEXT NOT NULL);"
 select_todos = "SELECT * FROM carrinho;"
 truncate = "DELETE FROM carrinho;" #"TRUNCATE TABLE carrinho;"
 select_id = "SELECT * FROM carrinho WHERE id_prod like ?"
@@ -51,14 +53,14 @@ WHERE id_prod like :nome
 '''
 
 ## criar taela 
+@app.route('/criar')
 def cria_table():
     try:
-        crar_table
+        
         print("Tabela criada com sucesso!")
     except sql.Error as erro:
         print("Tabela ja cadastrada:", erro) 
-        fechar_conexao(conexao)
-
+        
 #cria_table()
 
 ## insere produto 
@@ -113,9 +115,9 @@ def remove_prod():
             print(linha)
             print("ITEM EXCLUIDO COM SUCESSO!")
         conexao.close()
-
-    
-
+    except:
+        pass
+   
 #remove_prod()
 
 ## Alteração de quantidade
