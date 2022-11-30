@@ -2,7 +2,7 @@
 Controle de carrinho utilizando SQLite
 
 * Adição de produtos - Ok 
-* Remoção de produtos
+* Remoção de produtos - OK
 * Alteração de quantidade
 * Consulta de itens - ok
 
@@ -19,19 +19,46 @@ conexao.commit()
 conexao.rollback()
 
 '''
+from flask import Flask, redirect, url_for, request, render_template
 import sqlite3 as sql
+banco = 'cart.db'
 
-conexao = sql.connect('cart.db')
+app = Flask(__name__)
+
+conexao = sql.connect(banco)
 cursor = conexao.cursor()
+
+def fechar_conexao(conexao):
+    conexao.commit()
+    conexao.close()
+
+# Comandos SQL
+contagem = "SELECT COUNT(*) FROM carrinho;"
+cria_table = "CREATE TABLE IF NOT EXISTS carrinho (id_prod INTEGER PRIMARY KEY, Nome TEXT NOT NULL, Preço REAL NOT NULL, Quantidade INTEGER NOT NULL, Descrição TEXT NOT NULL);"
+select_todos = "SELECT * FROM carrinho;"
+truncate = "DELETE FROM carrinho;" #"TRUNCATE TABLE carrinho;"
+select_id = "SELECT * FROM carrinho WHERE id_prod like ?"
+delete_id = "DELETE FROM carrinho WHERE id_prod like ?"
+insert = "INSERT INTO carrinho VALUES (:id,:Nome,:Preco,:Quantidade,:Descrição,)"
+update = '''
+UPDATE carrinho SET
+    id_prod = :nome,
+    Nome = :idade,
+    Preço = :filhos,
+    Quantidade = :estado,
+    Descrição = :altura
+WHERE id_prod like :nome  
+'''
 
 ## criar taela 
 def cria_table():
     try:
-        cursor.execute('CREATE TABLE IF NOT EXISTS carrinho (id_prod INTEGER PRIMARY KEY, Nome TEXT NOT NULL, Preço REAL NOT NULL, Quantidade INTEGER NOT NULL, Descrição TEXT NOT NULL)') 
+        crar_table
         print("Tabela criada com sucesso!")
     except sql.Error as erro:
         print("Tabela ja cadastrada:", erro) 
-        conexao.close()
+        fechar_conexao(conexao)
+
 #cria_table()
 
 ## insere produto 
@@ -66,6 +93,17 @@ def inser_vprod():
 #inser_vprod()
 
 ## Remoção de produtos
+@app.route('/delete/<id_prod>')
+def delete_name(id_prod):
+    try:
+        conexao, cursor = abrir_conexao(banco)
+        resultado = cursor.execute(delete_id, [id_prod]).rowcount
+        fechar_conexao(conexao)
+    except sql.Error as erro:
+        print("Erro ao excluir o produto:", erro) 
+        conexao    
+    return {'message': f'{resultado} aluno(s) foram removido(s)!'}
+
 def remove_prod():
     try:
         cursor.execute("DELETE from carrinho WHERE id_prod = '2' ")
@@ -76,9 +114,8 @@ def remove_prod():
             print("ITEM EXCLUIDO COM SUCESSO!")
         conexao.close()
 
-    except sql.Error as erro:
-        print("Erro ao excluir o produto:", erro) 
-        conexao.close()
+    
+
 #remove_prod()
 
 ## Alteração de quantidade
@@ -98,3 +135,6 @@ def consulta():
         print("Banco de dados vazio:", erro) 
         conexao.close()
 #consulta()
+
+if __name__ == "__main__":
+    app.run(debug=True)
