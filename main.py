@@ -41,7 +41,7 @@ def method_name():
 def method_name():
     pass
 
-@app.route('/consulta/<id>')
+@app.route('/consulta/<id>') 
 def consulta_id():
     try:
         resultado = cursor.execute("select * from carrinho where id_prod ='2' ")
