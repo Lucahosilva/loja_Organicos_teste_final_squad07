@@ -8,4 +8,4 @@ def consulta_catalogo():
     cursor = db['Produtos'].find()
     resultado_db = list(cursor)
     return resultado_db
-
+    
