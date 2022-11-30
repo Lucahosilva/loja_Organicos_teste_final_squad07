@@ -41,8 +41,8 @@ def method_name():
 def method_name():
     pass
 
-@app.route('/')
-def method_name():
+@app.route('/consulta/<id>')
+def consulta_id():
     try:
         resultado = cursor.execute("select * from carrinho where id_prod ='2' ")
         for linha in resultado:
@@ -53,7 +53,6 @@ def method_name():
         print("Banco de dados vazio:", erro) 
         conn.close()
     pass
-
 
 if __name__ == "__main__":
     app.run(debug=True)
