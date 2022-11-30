@@ -1,7 +1,7 @@
 '''
 Controle de carrinho utilizando SQLite
 
-* Adição de produtos
+* Adição de produtos - Ok 
 * Remoção de produtos
 * Alteração de quantidade
 * Consulta de itens
@@ -27,11 +27,11 @@ cursor = conexao.cursor()
 
 # criar taela 
 
-cursor.execute('CREATE TABLE IF NOT EXISTS carrinho (id INTEGER PRIMARY KEY, Nome TEXT NOT NULL, Preço int NOT NULL, Descrição TEXT NOT NULL)') 
+cursor.execute('CREATE TABLE IF NOT EXISTS carrinho (id INTEGER PRIMARY KEY, Nome TEXT NOT NULL, Preço int NOT NULL, Quantidade int NOT NULL, Descrição TEXT NOT NULL)') 
 
 # Adição de produtos
 
-cursor.execute("INSERT INTO carrinho VALUES(2,'Mamão',15,'Mamão do Brasil')")
+cursor.execute("INSERT INTO carrinho VALUES(2,'Mamão',15,2,'Mamão do Brasil')")
 
 conexao.commit()
 
