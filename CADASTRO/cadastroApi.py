@@ -32,5 +32,17 @@ def alterar_produto_pelo_nome(parametros):
                     {chave: valor}
                 }
             )
-                
-consulta_catalogo()
+
+def deletar_produto(parametros):
+    produto = db['Produtos'].find_one({'nome': parametros['nome']})
+    if produto: 
+        db['Produtos'].delete_one({'nome': parametros['nome']})
+        print("message: Produto deletado com sucesso!")
+        return {'message': 'Produto deletado com sucesso!'}
+    else: 
+        print("error': 'Produto não encontrado!")
+        return {'error': 'Produto não encontrado!'}
+    
+    
+
+deletar_produto({'nome':'Banana'})
