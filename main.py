@@ -85,7 +85,7 @@ def inser_prod():
 @app.route('/modifir')
 def modificar_prod():
     conn, cursor = abrir_conexao(banco) # abertura do banco
-
+    # UPDATE table_name SET column1 = value1, column2 = value2 WHERE [condition];
 
     fechar_conexao(conn)
     pass
@@ -93,7 +93,7 @@ def modificar_prod():
 @app.route('/remover')
 def remover_prod():
     conn, cursor = abrir_conexao(banco) # abertura do banco
-
+    #DELETE FROM COMPANY WHERE id_prod = 7;
     fechar_conexao(conn) # fecha o banco
     pass
 
