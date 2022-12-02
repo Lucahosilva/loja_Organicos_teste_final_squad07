@@ -2,7 +2,6 @@ import sqlite3 as sql
 from json import dumps
 from fastapi import FastAPI
 
-
 # Rodar API - uvicorn main:app
 # http://127.0.0.1:8000/doc
 # http://127.0.0.1:8000/redoc
@@ -12,14 +11,15 @@ from fastapi import FastAPI
 banco = "cart.db"
 
 # Comandos SQL
-contagem = "SELECT COUNT(*) FROM Carrinho;"
+# contagem = "SELECT COUNT(*) FROM Carrinho;"
 criar_table = "CREATE TABLE IF NOT EXISTS Carrinho (id_prod INTEGER PRIMARY KEY, Nome TEXT NOT NULL, Preço REAL NOT NULL, Quantidade INTEGER NOT NULL, Descrição TEXT NOT NULL);"
 select_todos = "SELECT * FROM Carrinho;"
 truncate = "DELETE FROM Carrinho;" #"TRUNCATE TABLE carrinho;"
-select_id = "SELECT * FROM Carrinho WHERE id_prod like ?;"
-delete_id = "DELETE FROM Carrinho WHERE id_prod = ?;"
-inserir_prod = "INSERT INTO Carrinho VALUES (:id,:Nome,:Preco,:Quantidade,:Descrição,);"
+#select_id = "SELECT * FROM Carrinho WHERE id_prod like ?;"
+#delete_id = "DELETE FROM Carrinho WHERE id_prod = ?;"
+#inserir_prod = "INSERT INTO Carrinho VALUES (:id,:Nome,:Preco,:Quantidade,:Descrição,);"
 atualiza_prod = "UPDATE carrinho SET quantidade = [valor] WHERE id_prod = [id_produto];" 
+inserir = "INSERT INTO carrinho VALUES(id_prod,Nome,Preço,Quantidade,Descrição)', data;"
 
 def abrir_conexao(banco):
     conn = sql.connect(banco) #connection to db
@@ -39,10 +39,9 @@ async def criar_tabela():
 @app.post('/criar_tabela') # FUNCIONADO
 async def criar_tabela(): 
     conn, cursor = abrir_conexao(banco)
-    resutado = cursor.execute(criar_table)
-    print(resutado)
+    resultado = cursor.execute(criar_table)
     fechar_conexao(conn)
-    return("Cadastrado, vide console.")
+    return {'Tabela': f'{resultado} criada.'}
 
 @app.get('/consulta') # FUNCIONANDO
 def consulta_tabela():
@@ -54,7 +53,6 @@ def consulta_tabela():
 @app.put('/modifica') # testando - ERROR 500
 def modificar_prod(id_produto, valor):
     conn, cursor = abrir_conexao(banco) # abertura do banco
-    # UPDATE table_name SET column1 = value1, column2 = value2 WHERE [condition];
     resultado = cursor.execute(atualiza_prod)
     print(resultado)
     fechar_conexao(conn)
@@ -66,3 +64,27 @@ def deleta_tabela():
     cursor.execute(truncate)
     fechar_conexao(conexao)
     return {'message': 'Carrinho apagado!'}
+
+# EXTRA ADICONAR DADOS
+
+@app.post('/alimentar') # Testando
+def alimentar_tabela():
+    try:
+        conn, cursor = abrir_conexao(banco)
+        data = [
+        (1,'Cacau',12.5,3,'Do Brasil'),
+        (2,'Arroz',10,2,'Do Brasil'),
+        (3,'Feijão',8,5,'Do Brasil'),
+        (4,'Batata',11,10,'Do Brasil'),
+        (5,'Café',8,5,'Do Brasil'),
+        (6,'Vinho',15,2,'Da Argentina'),
+        ]
+        cursor.executemany('INSERT INTO carrinho VALUES(?,?,?,?,?)', data)
+        resultado = cursor.execute(select_todos)
+        print(resultado)
+        fechar_conexao(conn)
+    except sql.Error as erro:
+        print("Erro ao adicionar produto'(s)', verificar parametros.", erro) 
+        fechar_conexao(conn)
+        return("Cadastrado")
+        

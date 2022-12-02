@@ -47,18 +47,22 @@ def criar_table():
     fechar_conexao(conn)
     return("Cadastrado, vide console.")
     
-# @app.route('/adc_m/', methods=['PUT']) # ADICONAR VARIOS ITENS - adicionar form
-# def inser_vprod():
-#     conn, cursor = abrir_conexao(banco)
-#     data = [
-#        (1,'Cacau',12.5,3,'Do Brasil'),
-#        (2,'Arroz',10,2,'Do Brasil'),
-#     ]
-#     cursor.executemany('INSERT INTO carrinho VALUES(?,?,?,?,?)', data)
-#     resultado = cursor.execute(select_todos)
-#     print(resultado)
-#     fechar_conexao(conn)
-#     return("Cadastrado, vide console.")
+@app.route('/adc_m/', methods=['PUT']) # ADICONAR VARIOS ITENS - adicionar form
+def inser_vprod():
+    conn, cursor = abrir_conexao(banco)
+    data = [
+       (1,'Cacau',12.5,3,'Do Brasil'),
+       (2,'Arroz',10,2,'Do Brasil'),
+       (3,'Feijão',8,5,'Do Brasil'),
+       (4,'Batata',11,10,'Do Brasil'),
+       (5,'Café',8,5,'Do Brasil'),
+       (6,'Vinho',15,2,'Da Argentina'),
+    ]
+    cursor.executemany('INSERT INTO carrinho VALUES(?,?,?,?,?)', data)
+    resultado = cursor.execute(select_todos)
+    print(resultado)
+    fechar_conexao(conn)
+    return("Cadastrado, vide console.")
 
 @app.route('/cadastro', methods=['POST']) # ADICIONAR 1 ITEM - adicionar form
 def inser_prod():
