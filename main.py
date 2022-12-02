@@ -19,7 +19,7 @@ truncate = "DELETE FROM Carrinho;" #"TRUNCATE TABLE carrinho;"
 #delete_id = "DELETE FROM Carrinho WHERE id_prod = ?;"
 #inserir_prod = "INSERT INTO Carrinho VALUES (:id,:Nome,:Preco,:Quantidade,:Descrição,);"
 atualiza_prod = "UPDATE carrinho SET quantidade = [valor] WHERE id_prod = [id_produto];" 
-inserir = "INSERT INTO carrinho VALUES(id_prod,Nome,Preço,Quantidade,Descrição)', data;"
+
 
 def abrir_conexao(banco):
     conn = sql.connect(banco) #connection to db
@@ -50,13 +50,15 @@ def consulta_tabela():
     fechar_conexao(conn)
     return {'Produtos': f'{resultado}'}
 
-@app.put('/modifica') # testando - ERROR 500
-def modificar_prod(id_produto, valor):
-    conn, cursor = abrir_conexao(banco) # abertura do banco
-    resultado = cursor.execute(atualiza_prod)
-    print(resultado)
-    fechar_conexao(conn)
-    return {'Produto cadastrado: ': f'{resultado}'}
+@app.put('/update/{id_prod}/{Quantidade}') # testando - ERROR 404 - Validation Error
+def update_prod_id(id_prod,Quantidade):
+    try:
+        conn, cursor = abrir_conexao(banco)
+        cursor.execute('UPDATE carrinho SET Quantidade = [Quantidade] WHERE id_prod = [id_prod]')
+    except sql.Error as erro:
+        resultado = erro
+        fechar_conexao(conn)
+        return (f'Erro ao adicionar produto(s), verificar parametros {resultado}')
 
 @app.delete('/deleta') # FUNCIONANDO
 def deleta_tabela():
@@ -67,7 +69,7 @@ def deleta_tabela():
 
 # EXTRA ADICONAR DADOS
 
-@app.post('/alimentar') # Testando
+@app.post('/alimentar') # FUNCIONANDO
 def alimentar_tabela():
     try:
         conn, cursor = abrir_conexao(banco)
@@ -79,12 +81,12 @@ def alimentar_tabela():
         (5,'Café',8,5,'Do Brasil'),
         (6,'Vinho',15,2,'Da Argentina'),
         ]
-        cursor.executemany('INSERT INTO carrinho VALUES(?,?,?,?,?)', data)
+        cursor.executemany('INSERT INTO Carrinho VALUES(?,?,?,?,?)', data)
         resultado = cursor.execute(select_todos)
         print(resultado)
         fechar_conexao(conn)
-    except sql.Error as erro:
-        print("Erro ao adicionar produto'(s)', verificar parametros.", erro) 
-        fechar_conexao(conn)
         return("Cadastrado")
-        
+    except sql.Error as erro:
+        resultado = erro
+        fechar_conexao(conn)
+        return (f'Erro ao adicionar produto(s), verificar parametros {erro}')
