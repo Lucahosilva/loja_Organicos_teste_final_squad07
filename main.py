@@ -38,7 +38,7 @@ def fechar_conexao(conn):
 def main():
     return render_template("index.html") 
 
-@app.route('/criar_tabela') # testando
+@app.route('/criar_tabela', methods=['POST']) # testando
 def criar_table():
     conn, cursor = abrir_conexao(banco)
     resutado = cursor.execute(criar_table)
@@ -46,7 +46,7 @@ def criar_table():
     fechar_conexao(conn)
     return("Cadastrado, vide console.")
     
-# @app.route('/adc_m/') # ADICONAR VARIOS ITENS - adicionar form
+# @app.route('/adc_m/', methods=['PUT']) # ADICONAR VARIOS ITENS - adicionar form
 # def inser_vprod():
 #     conn, cursor = abrir_conexao(banco)
 #     data = [
@@ -59,7 +59,7 @@ def criar_table():
 #     fechar_conexao(conn)
 #     return("Cadastrado, vide console.")
 
-@app.route('/adc', methods=['POST']) # ADICIONAR 1 ITEM - adicionar form
+@app.route('/cadastro', methods=['POST']) # ADICIONAR 1 ITEM - adicionar form
 def inser_prod():
     conn, cursor = abrir_conexao(banco) # abertura do banco
     cursor.execute(inser_prod)
@@ -68,7 +68,7 @@ def inser_prod():
     print(banco)
     return("Cadastrado, vide console.")
 
-@app.route('/modifir/<id_produ>/<valor>', methods=['PUT']) # testando
+@app.route('/modifica/<id_produ>/<valor>', methods=['PUT']) # testando
 def modificar_prod(id_produ, valor):
     conn, cursor = abrir_conexao(banco) # abertura do banco
     # UPDATE table_name SET column1 = value1, column2 = value2 WHERE [condition];
@@ -77,7 +77,7 @@ def modificar_prod(id_produ, valor):
     fechar_conexao(conn)
     return {'Produto cadastrado: ': f'{resultado}'}
 
-@app.route('/consul_t', methods=['POST']) # CONULTAR TABLE POR ID_PROD - OK
+@app.route('/consulta', methods=['POST']) # CONULTAR TABLE POR ID_PROD - OK
 def consulta_t():
     conn, cursor = abrir_conexao(banco) # abertura do banco
     resultado = cursor.execute(select_todos).fetchall() 
@@ -85,7 +85,7 @@ def consulta_t():
     fechar_conexao(conn)
     return {'Produtos': f'{resultado}'}
 
-@app.route('/consul/<int:id_produto>', methods=['POST']) # CONULTAR TABLE POR ID_PROD - OK
+@app.route('/consulta/<int:id_produto>', methods=['GET']) # CONULTAR TABLE POR ID_PROD - OK
 def consulta_id(id_produto):
     conn, cursor = abrir_conexao(banco) # abertura do banco
     resultado = cursor.execute(select_id).fetchall() 
@@ -93,7 +93,7 @@ def consulta_id(id_produto):
     fechar_conexao(conn)
     return {'Produtos': f'{resultado}'}
 
-@app.route('/contar') # CONTAGEM DE PRODUTOS - OK
+@app.route('/produtos', methods=['GET']) # CONTAGEM DE PRODUTOS - OK
 def prod_cont():    
     conexao, cursor = abrir_conexao(banco)
     resultado = cursor.execute(contagem).fetchone()
@@ -101,7 +101,7 @@ def prod_cont():
     fechar_conexao(conexao)
     return {'Produtos': f'{resultado[0]} Itens no carrinho'}
 
-@app.route('/remover/<int:id_produto>', methods=['DELETE']) # testar
+@app.route('/deleta/<int:id_produto>', methods=['DELETE']) # testar
 def remover_prod(id_produto):
     conn, cursor = abrir_conexao(banco) # abertura do banco
     resultado = cursor.execute(delete_id)
