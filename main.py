@@ -1,12 +1,13 @@
-'''
-* Adição de produtos -
-* Remoção de produtos - 
-* Alteração de quantidade -
-* Consulta de itens - 
-'''
 import sqlite3 as sql
-from flask import Flask, redirect, url_for, request, render_template 
 from json import dumps
+from fastapi import FastAPI
+
+
+# Rodar API - uvicorn main:app
+# http://127.0.0.1:8000/doc
+# http://127.0.0.1:8000/redoc
+
+# cliente thunder raio
 
 banco = "cart.db"
 
@@ -18,10 +19,7 @@ truncate = "DELETE FROM Carrinho;" #"TRUNCATE TABLE carrinho;"
 select_id = "SELECT * FROM Carrinho WHERE id_prod like ?;"
 delete_id = "DELETE FROM Carrinho WHERE id_prod = ?;"
 inserir_prod = "INSERT INTO Carrinho VALUES (:id,:Nome,:Preco,:Quantidade,:Descrição,);"
-atualiza_prod = "UPDATE carrinho SET quantidade = [valor] WHERE id_prod = [id_produ];" 
-app = Flask(__name__)
-
-#----- topico 3. carrinho 
+atualiza_prod = "UPDATE carrinho SET quantidade = [valor] WHERE id_prod = [id_produto];" 
 
 def abrir_conexao(banco):
     conn = sql.connect(banco) #connection to db
@@ -32,44 +30,29 @@ def fechar_conexao(conn):
     conn.commit()
     conn.close()
 
-# ROTAS
+app= FastAPI()
 
-@app.route('/')
-def main():
-    return render_template("index.html") 
+@app.get('/') # FUNCIONANDO
+async def criar_tabela(): 
+    return ("SEJA BEM VINDO(A) A API ORGANICOS ")
 
-@app.route('/criar_tabela', methods=['POST']) # testando
-def criar_table():
+@app.post('/criar_tabela') # FUNCIONADO
+async def criar_tabela(): 
     conn, cursor = abrir_conexao(banco)
     resutado = cursor.execute(criar_table)
     print(resutado)
     fechar_conexao(conn)
     return("Cadastrado, vide console.")
-    
-# @app.route('/adc_m/', methods=['PUT']) # ADICONAR VARIOS ITENS - adicionar form
-# def inser_vprod():
-#     conn, cursor = abrir_conexao(banco)
-#     data = [
-#        (1,'Cacau',12.5,3,'Do Brasil'),
-#        (2,'Arroz',10,2,'Do Brasil'),
-#     ]
-#     cursor.executemany('INSERT INTO carrinho VALUES(?,?,?,?,?)', data)
-#     resultado = cursor.execute(select_todos)
-#     print(resultado)
-#     fechar_conexao(conn)
-#     return("Cadastrado, vide console.")
 
-@app.route('/cadastro', methods=['POST']) # ADICIONAR 1 ITEM - adicionar form
-def inser_prod():
+@app.get('/consulta') # FUNCIONANDO
+def consulta_tabela():
     conn, cursor = abrir_conexao(banco) # abertura do banco
-    cursor.execute(inser_prod)
-    conn.commit()
+    resultado = cursor.execute(select_todos).fetchall() 
     fechar_conexao(conn)
-    print(banco)
-    return("Cadastrado, vide console.")
+    return {'Produtos': f'{resultado}'}
 
-@app.route('/modifica/<id_produ>/<valor>', methods=['PUT']) # testando
-def modificar_prod(id_produ, valor):
+@app.put('/modifica') # testando - ERROR 500
+def modificar_prod(id_produto, valor):
     conn, cursor = abrir_conexao(banco) # abertura do banco
     # UPDATE table_name SET column1 = value1, column2 = value2 WHERE [condition];
     resultado = cursor.execute(atualiza_prod)
@@ -77,44 +60,9 @@ def modificar_prod(id_produ, valor):
     fechar_conexao(conn)
     return {'Produto cadastrado: ': f'{resultado}'}
 
-@app.route('/consulta', methods=['POST']) # CONULTAR TABLE POR ID_PROD - OK
-def consulta_t():
-    conn, cursor = abrir_conexao(banco) # abertura do banco
-    resultado = cursor.execute(select_todos).fetchall() 
-    print(resultado)
-    fechar_conexao(conn)
-    return {'Produtos': f'{resultado}'}
-
-@app.route('/consulta/<int:id_produto>', methods=['GET']) # CONULTAR TABLE POR ID_PROD - OK
-def consulta_id(id_produto):
-    conn, cursor = abrir_conexao(banco) # abertura do banco
-    resultado = cursor.execute(select_id).fetchall() 
-    print(resultado)
-    fechar_conexao(conn)
-    return {'Produtos': f'{resultado}'}
-
-@app.route('/produtos', methods=['GET']) # CONTAGEM DE PRODUTOS - OK
-def prod_cont():    
-    conexao, cursor = abrir_conexao(banco)
-    resultado = cursor.execute(contagem).fetchone()
-    print(resultado)
-    fechar_conexao(conexao)
-    return {'Produtos': f'{resultado[0]} Itens no carrinho'}
-
-@app.route('/deleta/<int:id_produto>', methods=['DELETE']) # testar
-def remover_prod(id_produto):
-    conn, cursor = abrir_conexao(banco) # abertura do banco
-    resultado = cursor.execute(delete_id)
-    print(resultado)
-    fechar_conexao(conn) # fecha o banco
-    return {'Produtos': f'{resultado} Deletado'}
-
-@app.route('/deleta')
-def deleta_tudo():
+@app.delete('/deleta') # FUNCIONANDO
+def deleta_tabela():
     conexao, cursor = abrir_conexao(banco)
     cursor.execute(truncate)
     fechar_conexao(conexao)
     return {'message': 'Carrinho apagado!'}
-    
-if __name__ == "__main__":
-    app.run(debug=True)
