@@ -9,7 +9,7 @@ from fastapi import FastAPI
 # cliente thunder raio
 
 banco = "cart.db"
-
+#
 # Comandos SQL
 # contagem = "SELECT COUNT(*) FROM Carrinho;"
 criar_table = "CREATE TABLE IF NOT EXISTS Carrinho (id_prod INTEGER PRIMARY KEY, Nome TEXT NOT NULL, Preço REAL NOT NULL, Quantidade INTEGER NOT NULL, Descrição TEXT NOT NULL);"
