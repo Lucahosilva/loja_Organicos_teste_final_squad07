@@ -1,13 +1,8 @@
 import sqlite3 as sql
 from json import dumps
-from fastapi import FastAPI
+from flask import Flask
 
-# Rodar API - uvicorn main:app
-# http://127.0.0.1:8000/doc
-# http://127.0.0.1:8000/redoc
-
-# cliente thunder raio
-
+app= Flask(__name__)
 banco = "cart.db"
 #
 # Comandos SQL
@@ -30,18 +25,16 @@ def fechar_conexao(conn):
     conn.commit()
     conn.close()
 
-app= FastAPI()
-
 @app.get('/') # FUNCIONANDO
-async def criar_tabela(): 
-    return ("SEJA BEM VINDO(A) A API ORGANICOS ")
+def home(): 
+    return ("SEJA BEM VINDO(A) A API ORGANICOS "), 201
 
 @app.post('/criar_tabela') # FUNCIONADO
-async def criar_tabela(): 
+def criar_tabela(): 
     conn, cursor = abrir_conexao(banco)
     resultado = cursor.execute(criar_table)
     fechar_conexao(conn)
-    return {'Tabela': f'{resultado} criada.'}
+    return {'Tabela': f'{resultado} criada.'}, 201
 
 @app.get('/consulta') # FUNCIONANDO
 def consulta_tabela():
@@ -65,7 +58,7 @@ def deleta_tabela():
     conexao, cursor = abrir_conexao(banco)
     cursor.execute(truncate)
     fechar_conexao(conexao)
-    return {'message': 'Carrinho apagado!'}
+    return {'message': 'Carrinho apagado!'}, 204
 
 # EXTRA ADICONAR DADOS
 
@@ -85,13 +78,11 @@ def alimentar_tabela():
         resultado = cursor.execute(select_todos)
         print(resultado)
         fechar_conexao(conn)
-        return("Cadastrado")
+        return("Cadastrado") , 202
     except sql.Error as erro:
         resultado = erro
         fechar_conexao(conn)
-        return (f'Erro ao adicionar produto(s), verificar parametros {erro}')
+        return (f'Erro ao adicionar produto(s), verificar parametros {erro}'), 400
 
 if __name__ == '__main__':
-    import uvicorn
-    uvicorn.rum("main:app", host="127.0.0.1", port=8000,log_level="info", reload=True )
-# rodar API direto com Python - python main.py
+    app.run(debug=True, port=8000)
