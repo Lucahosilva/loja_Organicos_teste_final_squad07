@@ -13,8 +13,8 @@ truncate = "DELETE FROM carrinho;" #"TRUNCATE TABLE carrinho;"
 select_id = "SELECT * FROM carrinho WHERE id_prod like ?;"
 delete_id = "DELETE FROM carrinho WHERE id_prod = ?;"
 #inserir_prod = "INSERT INTO Carrinho VALUES (:id,:Nome,:Preco,:Quantidade,:Descrição,);"
-atualiza_prod = "UPDATE INTO caarrinho SET quantidade = (quantidade) WHERE id_prod = (id_prod);" 
-atualiza_id = "UPDATE carrinho SET quantidade = ? WHERE id_prod = ?;"
+atualiza_prod = "UPDATE carrinho SET quantidade = (quantidade) WHERE id_prod = (id_prod);" 
+
 
 
 def abrir_conexao(banco):
@@ -52,10 +52,10 @@ def consulta_id(id_prod):
     return {'Produtos': f'{resultado}'}, 200
 
 @app.route('/atualiza/<id_prod>/<quantidade>', methods = ['PUT']) # testando - Executa como se estivesse correto porem não altera o banco
-def update_quanti(id_prod,quantidade): # /atualiza/2/20
+def update_quanti(id_prod:int,quantidade:int): # /atualiza/2/20
     # try:
         conexao, cursor = abrir_conexao(banco)
-        cursor.execute(atualiza_id[quantidade],[id_prod])
+        cursor.execute(atualiza_prod[quantidade, id_prod])   
         fechar_conexao(conexao)
         return (f'id {id_prod} - Quantidade alterada para {quantidade} com sucesso'), 202
     # except sql.Error as erro:
@@ -77,7 +77,7 @@ def deleta_id(id_prod):
     fechar_conexao(conexao)
     return (f'Mensagem: Produto ID: {id_prod} deletado com sucesso'), 200
    
-@app.route('/alimentar/<id_prod>/<name>/<value>/<quantity>/<desc>') # FUNCIONANDO 
+@app.route('/alimentar/<id_prod>/<name>/<value>/<quantity>/<desc>', methods=['POST']) # FUNCIONANDO 
 def alimentar_tabela(id_prod, name, value, quantity, desc): # /alimentar/1/Carro/10.50/1/1.0 sem Ar
     try:
         conexao, cursor = abrir_conexao(banco)
