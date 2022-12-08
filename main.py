@@ -68,19 +68,14 @@ def deleta_tabela():
     fechar_conexao(conexao)
     return {'message': 'Carrinho apagado!'}#, 204
 
-@app.route('/deletar/<id_prod>') # FUNCIONANDO, MAS A MANSAGEM DE RETURN NÃO VOLTA - , methods=['DELETE'] 
+@app.route('/deletar/<id_prod>') # FUNCIONANDO, corrigido
 def deleta_id(id_prod):
-    try:
-        conexao, cursor = abrir_conexao(banco)
-        cursor.execute(delete_id, [id_prod])
-        fechar_conexao(conexao)
-        return {f'mensagem': 'produto deletado com sucesso'}, 200
-    except sql.Error as erro:
-        resultado = erro
-        fechar_conexao(conexao)
-        return (f'Erro ao deletar produto, verificar parametros {resultado}'), 400
-
-@app.route('/alimentar/<id_prod>/<name>/<value>/<quantity>/<desc>') # FUNCIONANDO - , methods=['POST'] / /alimentar/1/Carro/10.50/1/1.0 sem Ar
+    conexao, cursor = abrir_conexao(banco)
+    cursor.execute(delete_id, [id_prod])
+    fechar_conexao(conexao)
+    return (f'Mensagem: Produto ID: {id_prod} deletado com sucesso'), 200
+   
+@app.route('/alimentar/<id_prod>/<name>/<value>/<quantity>/<desc>') # FUNCIONANDO /alimentar/1/Carro/10.50/1/1.0 sem Ar
 def alimentar_tabela(id_prod, name, value, quantity, desc):
     try:
         conexao, cursor = abrir_conexao(banco)
