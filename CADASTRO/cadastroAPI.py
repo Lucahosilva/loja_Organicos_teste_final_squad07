@@ -30,16 +30,16 @@ def consulta_catalogo():
 @app.route('/consulta_produto', methods=["GET"])
 def consulta_produto():
     parametros = request.args.to_dict()
-    chave = list(parametros.keys())[0]
-    valor = parametros.get(list(parametros.keys())[0])
-    if valor.isnumeric():
-        valor = int(valor)
-    elif is_number(valor):
-        valor = float(valor)
-        
     if not parametros:
         return {'successful': False, 'status': 400, 'message': "Nenhum parâmetro recebido"}, 400
     else:
+        chave = list(parametros.keys())[0]
+        valor = parametros.get(list(parametros.keys())[0])
+        if valor.isnumeric():
+            valor = int(valor)
+        elif is_number(valor):
+            valor = float(valor)
+        
         if len(parametros) > 1:
             return {'successful': False, 'status': 400, 'message': "Somente um parâmetro será aceito na consulta"}, 400
         else:
