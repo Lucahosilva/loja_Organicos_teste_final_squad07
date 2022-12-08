@@ -7,91 +7,95 @@ banco = "cart.db"
 #
 # Comandos SQL
 # contagem = "SELECT COUNT(*) FROM Carrinho;"
-criar_table = "CREATE TABLE IF NOT EXISTS Carrinho (id_prod INTEGER PRIMARY KEY, Nome TEXT NOT NULL, Preço REAL NOT NULL, Quantidade INTEGER NOT NULL, Descrição TEXT NOT NULL);"
-select_todos = "SELECT * FROM Carrinho;"
-truncate = "DELETE FROM Carrinho;" #"TRUNCATE TABLE carrinho;"
-select_id = "SELECT * FROM Carrinho WHERE id_prod like ?;"
-delete_id = "DELETE FROM Carrinho WHERE id_prod = ?;"
+criar_table = "CREATE TABLE IF NOT EXISTS carrinho (id_prod INTEGER PRIMARY KEY, nome TEXT NOT NULL, preco REAL NOT NULL, quantidade INTEGER NOT NULL, desc TEXT NOT NULL);"
+select_todos = "SELECT * FROM carrinho;"
+truncate = "DELETE FROM carrinho;" #"TRUNCATE TABLE carrinho;"
+select_id = "SELECT * FROM carrinho WHERE id_prod like ?;"
+delete_id = "DELETE FROM carrinho WHERE id_prod = ?;"
 #inserir_prod = "INSERT INTO Carrinho VALUES (:id,:Nome,:Preco,:Quantidade,:Descrição,);"
-atualiza_prod = "UPDATE Carrinho SET Quantidade = ? WHERE id_prod like ?;" 
+atualiza_prod = "UPDATE carrinho SET quantidade = ? WHERE id_prod like ?;" 
 
 
 def abrir_conexao(banco):
-    conn = sql.connect(banco) #connection to db
-    cursor = conn.cursor() #create a cursor
-    return conn, cursor
+    conexao = sql.connect(banco) #connection to db
+    cursor = conexao.cursor() #create a cursor
+    return conexao, cursor
 
-def fechar_conexao(conn):
-    conn.commit()
-    conn.close()
+def fechar_conexao(conexao):
+    conexao.commit()
+    conexao.close()
 
 @app.get('/') # FUNCIONANDO
 def home(): 
     return ("SEJA BEM VINDO(A) A API ORGANICOS "), 200
 
-@app.post('/criar_tabela') # FUNCIONADO
+@app.route('/criar_tabela') # FUNCIONADO , methods=['POST']
 def criar_tabela(): 
-    conn, cursor = abrir_conexao(banco)
-    resultado = cursor.execute(criar_table)
-    fechar_conexao(conn)
-    return {'Tabela': f'{resultado} criada.'}, 201
+    conexao, cursor = abrir_conexao(banco)
+    cursor.execute(criar_table)
+    fechar_conexao(conexao)
+    return {'Tabela':'criada'}, 201
 
-@app.get('/consulta') # FUNCIONANDO
+@app.route('/consulta') # FUNCIONANDO , methods=['GET']
 def consulta_tabela():
-    conn, cursor = abrir_conexao(banco) # abertura do banco
+    conexao, cursor = abrir_conexao(banco) # abertura do banco
     resultado = cursor.execute(select_todos).fetchall() 
-    fechar_conexao(conn)
+    fechar_conexao(conexao)
     return {'Produtos': f'{resultado}'}, 200
 
-@app.get('/consulta/<id_prod>') #Funcionando 
+@app.route('/consulta/<id_prod>') #Funcionando , methods=['GET']
 def consulta_id(id_prod):
-    conn, cursor = abrir_conexao(banco) # abertura do banco
+    conexao, cursor = abrir_conexao(banco) # abertura do banco
     resultado = cursor.execute(select_id, [id_prod]).fetchall() 
-    fechar_conexao(conn)
+    fechar_conexao(conexao)
     return {'Produtos': f'{resultado}'}, 200
 
-@app.put('/update/<id_prod>/<Quantidade>') # testando - Executa como se estivesse correto porem não altera o banco
-def update_set_quantidade(id_prod,Quantidade):
+@app.route('/update/<id_prod>/<quantidade>') # , methods=['PUT'] / testando - Executa como se estivesse correto porem não altera o banco
+def update_set_quantidade(id_prod,quantidade):
     try:
-        conn, cursor = abrir_conexao(banco)
-        cursor.execute(atualiza_prod, [Quantidade, id_prod])
-        return (f'id {id_prod} - Quantidade alterada para {Quantidade} com sucesso'), 202
+        conexao, cursor = abrir_conexao(banco)
+        cursor.execute(atualiza_prod, [quantidade, id_prod])
+        return (f'id {id_prod} - Quantidade alterada para {quantidade} com sucesso'), 202
     except sql.Error as erro:
         resultado = erro
-        fechar_conexao(conn)
+        fechar_conexao(conexao)
         return (f'Erro ao adicionar produto(s), verificar parametros {resultado}'), 400
 
-@app.delete('/deleta') # FUNCIONANDO
+@app.route('/deletar') # FUNCIONANDO - , methods=['DELETE']
 def deleta_tabela():
     conexao, cursor = abrir_conexao(banco)
     cursor.execute(truncate)
     fechar_conexao(conexao)
-    return {'message': 'Carrinho apagado!'}, 204
+    return {'message': 'Carrinho apagado!'}#, 204
 
-@app.delete('/deleta_id/<id_prod>') # FUNCIONANDO, MAS A MANSAGEM DE RETURN NÃO VOLTA
+@app.route('/deletar/<id_prod>') # FUNCIONANDO, MAS A MANSAGEM DE RETURN NÃO VOLTA - , methods=['DELETE'] 
 def deleta_id(id_prod):
-    conexao, cursor = abrir_conexao(banco)
-    cursor.execute(delete_id, [id_prod])
-    fechar_conexao(conexao)
-    return {'mensagem': 'produto deletado com sucesso'}, 204
+    try:
+        conexao, cursor = abrir_conexao(banco)
+        cursor.execute(delete_id, [id_prod])
+        fechar_conexao(conexao)
+        return {f'mensagem': 'produto deletado com sucesso'}, 200
+    except sql.Error as erro:
+        resultado = erro
+        fechar_conexao(conexao)
+        return (f'Erro ao deletar produto, verificar parametros {resultado}'), 400
 
-
-@app.post('/alimentar/<id_prod>/<name>/<value>/<quantity>/<desc>') # FUNCIONANDO
+@app.route('/alimentar/<id_prod>/<name>/<value>/<quantity>/<desc>') # FUNCIONANDO - , methods=['POST'] / /alimentar/1/Carro/10.50/1/1.0 sem Ar
 def alimentar_tabela(id_prod, name, value, quantity, desc):
     try:
-        conn, cursor = abrir_conexao(banco)
+        conexao, cursor = abrir_conexao(banco)
         data = [
         #(1,'Cacau',12.5,3,'Do Brasil'),
         (id_prod,name,value,quantity,desc)
         ]
-        cursor.executemany('INSERT INTO Carrinho VALUES(?,?,?,?,?)', data)
+        cursor.executemany('INSERT INTO carrinho VALUES(?,?,?,?,?)', data)
         resultado = cursor.execute(select_todos)
-        fechar_conexao(conn)
+        fechar_conexao(conexao)
         return(f"{name} Cadastrado com sucesso") , 202
     except sql.Error as erro:
         resultado = erro
-        fechar_conexao(conn)
-        return (f'Erro ao adicionar produto(s), verificar parametros {erro}'), 400
+        fechar_conexao(conexao)
+        return (f'Erro ao adicionar produto(s), verificar parametros {resultado}'), 400
 
 if __name__ == '__main__':
     app.run(debug=True, port=8000)
