@@ -54,7 +54,6 @@ def consulta_id(id_prod):
 @app.route('/atualiza/<id_prod>/<quantidade>', methods = ['PUT']) # testando - Executa como se estivesse correto porem não altera o banco
 def update_quanti(id_prod,quantidade): # /atualiza/2/20
     # try:
-        print(f' teste {type(qtd)} {type(id_pr)}')
         conexao, cursor = abrir_conexao(banco)
         cursor.execute(f"UPDATE carrinho SET quantidade = {quantidade} WHERE id_prod = {id_prod}")   
         fechar_conexao(conexao)
