@@ -1,6 +1,6 @@
 import sqlite3 as sql
 from json import dumps
-from flask import Flask, make_response
+from flask import Flask
 
 app= Flask(__name__)
 banco = "cart.db"
@@ -30,28 +30,28 @@ def fechar_conexao(conexao):
 def home(): 
     return ("SEJA BEM VINDO(A) A API ORGANICOS "), 200
 
-@app.route('/criar_tabela', methods = ['POST']) # FUNCIONADO
+@app.post('/criar_tabela') # FUNCIONADO
 def criar_tabela(): 
     conexao, cursor = abrir_conexao(banco)
     cursor.execute(criar_table)
     fechar_conexao(conexao)
     return {'Tabela':'criada'}, 201
 
-@app.route('/consulta', methods=['GET']) # FUNCIONANDO 
+@app.get('/consulta') # FUNCIONANDO 
 def consulta_tabela():
     conexao, cursor = abrir_conexao(banco) # abertura do banco
     resultado = cursor.execute(select_todos).fetchall() 
     fechar_conexao(conexao)
     return {'Produtos': f'{resultado}'}, 200
 
-@app.route('/consulta/<id_prod>', methods=['GET'] ) #Funcionando 
+@app.get('/consulta/<id_prod>') #Funcionando 
 def consulta_id(id_prod):
     conexao, cursor = abrir_conexao(banco) # abertura do banco
     resultado = cursor.execute(select_id, [id_prod]).fetchall() 
     fechar_conexao(conexao)
     return {'Produtos': f'{resultado}'}, 200
 
-@app.route('/atualiza/<id_prod>/<quantidade>', methods = ['PUT']) # testando - Executa como se estivesse correto porem não altera o banco
+@app.put('/atualiza/<id_prod>/<quantidade>') #Funcionando
 def update_quanti(id_prod,quantidade): # /atualiza/2/20
     # try:
         conexao, cursor = abrir_conexao(banco)
@@ -63,26 +63,25 @@ def update_quanti(id_prod,quantidade): # /atualiza/2/20
     #     fechar_conexao(conexao)
     #     return (f'Erro ao atulizar produto {id_prod}, verificar parametros {resultado}')#, 400
 
-@app.route('/deletar', methods=['DELETE']) # FUNCIONANDO 
+@app.delete('/deletar') # FUNCIONANDO 
 def deleta_tabela():
     conexao, cursor = abrir_conexao(banco)
     cursor.execute(truncate)
     fechar_conexao(conexao)
-    return {'message': 'Carrinho apagado!'}#, 204
+    return {'message': 'Carrinho apagado!'} , 200
 
-@app.route('/deletar/<id_prod>', methods=['DELETE']) # FUNCIONANDO
+@app.delete('/deletar/<id_prod>') # FUNCIONANDO
 def deleta_id(id_prod):
     conexao, cursor = abrir_conexao(banco)
     cursor.execute(delete_id, [id_prod])
     fechar_conexao(conexao)
-    return (f'Mensagem: Produto ID: {id_prod} deletado com sucesso'), 200
+    return {'Mensagem': f'Produto ID {id_prod} deletado com sucesso'}, 200
    
-@app.route('/alimentar/<id_prod>/<name>/<value>/<quantity>/<desc>', methods=['POST']) # FUNCIONANDO 
+@app.post('/alimentar/<id_prod>/<name>/<value>/<quantity>/<desc>') # FUNCIONANDO 
 def alimentar_tabela(id_prod, name, value, quantity, desc): # /alimentar/1/Carro/10.50/1/1.0 sem Ar
     try:
         conexao, cursor = abrir_conexao(banco)
         data = [
-        #(1,'Cacau',12.5,3,'Do Brasil'),
         (id_prod,name,value,quantity,desc)
         ]
         cursor.executemany('INSERT INTO carrinho VALUES(?,?,?,?,?)', data)
