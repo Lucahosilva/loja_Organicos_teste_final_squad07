@@ -26,9 +26,16 @@ def test_consulta_tabela_status_code(client):
     resultado = client.get('/consulta')
     assert resultado.status_code == 200
 
-def test_consulta_tabela_(client):
+def test_consulta_tabela_(client): # definir algum teste melhor 
     resultado = client.get('/consulta')
-
     assert resultado.status_code == 200
+
+def test_consulta_id_status_code(client):
+    resultado = client.get('/consulta/<-1>')
+    assert resultado.status_code == 200
+
+def test_consulta_id_return_null(client):
+    resultado = client.get('/consulta/<-1>')
+    assert resultado.json == {'Produtos': '[]'}
 
 
