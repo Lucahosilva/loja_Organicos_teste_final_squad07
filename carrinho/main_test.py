@@ -30,9 +30,9 @@ def test_consulta_tabela_status_code(client):
     resultado = client.get('/consulta')
     assert resultado.status_code == 200
 
-def test_consulta_tabela_(client): # definir algum teste melhor 
+def test_consulta_tabela_(client): # TESTE TABELA VAZIO
     resultado = client.get('/consulta')
-    assert resultado.status_code == 200
+    assert resultado.status_code == 200 # No Content
 
 #Rotas para consulta por ID
 def test_consulta_id_status_code(client):
