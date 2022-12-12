@@ -1,6 +1,6 @@
 import sqlite3 as sql
 from json import dumps
-from flask import Flask, make_response
+from flask import Flask
 
 app= Flask(__name__)
 banco = "cart.db"
@@ -13,7 +13,8 @@ truncate = "DELETE FROM carrinho;" #"TRUNCATE TABLE carrinho;"
 select_id = "SELECT * FROM carrinho WHERE id_prod like ?;"
 delete_id = "DELETE FROM carrinho WHERE id_prod = ?;"
 #inserir_prod = "INSERT INTO Carrinho VALUES (:id,:Nome,:Preco,:Quantidade,:Descrição,);"
-atualiza_prod = "UPDATE carrinho SET quantidade = ? WHERE id_prod like ?;" 
+atualiza_prod = "UPDATE carrinho SET quantidade = (quantidade) WHERE id_prod = (id_prod);" 
+
 
 
 def abrir_conexao(banco):
@@ -29,58 +30,58 @@ def fechar_conexao(conexao):
 def home(): 
     return ("SEJA BEM VINDO(A) A API ORGANICOS "), 200
 
-@app.route('/criar_tabela') # FUNCIONADO , methods=['POST']
+@app.post('/criar_tabela') # FUNCIONADO
 def criar_tabela(): 
     conexao, cursor = abrir_conexao(banco)
     cursor.execute(criar_table)
     fechar_conexao(conexao)
     return {'Tabela':'criada'}, 201
 
-@app.route('/consulta') # FUNCIONANDO , methods=['GET']
+@app.get('/consulta') # FUNCIONANDO 
 def consulta_tabela():
     conexao, cursor = abrir_conexao(banco) # abertura do banco
     resultado = cursor.execute(select_todos).fetchall() 
     fechar_conexao(conexao)
     return {'Produtos': f'{resultado}'}, 200
 
-@app.route('/consulta/<id_prod>') #Funcionando , methods=['GET']
+@app.get('/consulta/<id_prod>') #Funcionando 
 def consulta_id(id_prod):
     conexao, cursor = abrir_conexao(banco) # abertura do banco
     resultado = cursor.execute(select_id, [id_prod]).fetchall() 
     fechar_conexao(conexao)
     return {'Produtos': f'{resultado}'}, 200
 
-@app.route('/update/<id_prod>/<quantidade>') # , methods=['PUT'] / testando - Executa como se estivesse correto porem não altera o banco
-def update_set_quantidade(id_prod,quantidade):
-    try:
+@app.put('/atualiza/<id_prod>/<quantidade>') #Funcionando
+def update_quanti(id_prod,quantidade): # /atualiza/2/20
+    # try:
         conexao, cursor = abrir_conexao(banco)
-        cursor.execute(atualiza_prod, [quantidade, id_prod])
-        return (f'id {id_prod} - Quantidade alterada para {quantidade} com sucesso'), 202
-    except sql.Error as erro:
-        resultado = erro
+        cursor.execute(f"UPDATE carrinho SET quantidade = {quantidade} WHERE id_prod = {id_prod}")   
         fechar_conexao(conexao)
-        return (f'Erro ao adicionar produto(s), verificar parametros {resultado}'), 400
+        return (f'id {id_prod} - Quantidade alterada para {quantidade} com sucesso'), 202
+    # except sql.Error as erro:
+    #     resultado = erro
+    #     fechar_conexao(conexao)
+    #     return (f'Erro ao atulizar produto {id_prod}, verificar parametros {resultado}')#, 400
 
-@app.route('/deletar') # FUNCIONANDO - , methods=['DELETE']
+@app.delete('/deletar') # FUNCIONANDO 
 def deleta_tabela():
     conexao, cursor = abrir_conexao(banco)
     cursor.execute(truncate)
     fechar_conexao(conexao)
-    return {'message': 'Carrinho apagado!'}#, 204
+    return {'message': 'Carrinho apagado!'} , 200
 
-@app.route('/deletar/<id_prod>') # FUNCIONANDO, corrigido
+@app.delete('/deletar/<id_prod>') # FUNCIONANDO
 def deleta_id(id_prod):
     conexao, cursor = abrir_conexao(banco)
     cursor.execute(delete_id, [id_prod])
     fechar_conexao(conexao)
-    return (f'Mensagem: Produto ID: {id_prod} deletado com sucesso'), 200
+    return {'Mensagem': f'Produto ID {id_prod} deletado com sucesso'}, 200
    
-@app.route('/alimentar/<id_prod>/<name>/<value>/<quantity>/<desc>') # FUNCIONANDO /alimentar/1/Carro/10.50/1/1.0 sem Ar
-def alimentar_tabela(id_prod, name, value, quantity, desc):
+@app.post('/alimentar/<id_prod>/<name>/<value>/<quantity>/<desc>') # FUNCIONANDO 
+def alimentar_tabela(id_prod, name, value, quantity, desc): # /alimentar/1/Carro/10.50/1/1.0 sem Ar
     try:
         conexao, cursor = abrir_conexao(banco)
         data = [
-        #(1,'Cacau',12.5,3,'Do Brasil'),
         (id_prod,name,value,quantity,desc)
         ]
         cursor.executemany('INSERT INTO carrinho VALUES(?,?,?,?,?)', data)
