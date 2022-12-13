@@ -32,7 +32,7 @@ def test_consulta_tabela_status_code(client):
 
 def test_consulta_tabela_(client): # TESTE TABELA VAZIO
     resultado = client.get('/consulta')
-    assert resultado.status_code == 200 # No Content
+    assert resultado.status_code == 204 # No Content - deve dar negativo pois a tabela esta criada / oque tu acha lucas
 
 #Rotas para consulta por ID
 def test_consulta_id_status_code(client):
