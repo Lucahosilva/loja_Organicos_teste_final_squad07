@@ -70,17 +70,16 @@ def create_table():
                         primary key (id));
                     );
                     """)
-    return {"mensagem": "Created reporting table!!!"}
+    return {"Menssage": "Created reporting table!!!"}
 
 
 def popular_table():
     #----Popular itens na tabela--------------------------------------
     conexao, cursor = Server_connect()
     cursor.execute(group_itens)
-    print(group_itens)
     conexao.commit()
     cursor.close()
-    return {"mensagem": "items successfully created!!!"}
+    return {"Menssage": "items successfully created!!!"}
 
 
 def return_vendas():
@@ -112,7 +111,6 @@ def amount_sales():
                     FROM table_vendas group by produto, quant, valor;
                 """)
     resultado = cursor.fetchall()
-    print(resultado)
     cursor.close()
     return resultado
 
@@ -127,7 +125,6 @@ def top_ten():
                     ORDER BY total DESC LIMIT 10;
                 """)
     resultado = cursor.fetchall()
-    print(resultado)
     cursor.close()
     return resultado
 
@@ -142,7 +139,6 @@ def less_sold():
                     ORDER BY total ASC LIMIT 10;
                 """)
     resultado = cursor.fetchall()
-    print(resultado)
     cursor.close()
     return resultado
 
@@ -152,7 +148,6 @@ def get_iten(name):
     conexao, cursor = Server_connect()
     cursor.execute(f"SELECT produto, quant, valor FROM table_vendas WHERE produto LIKE '%{name}%';")
     resultado = cursor.fetchall()
-    print(resultado)
     cursor.close()
     return resultado
 
@@ -161,7 +156,5 @@ def clean_table():
 #----Limpar tabela de vendas-----------------
     conexao, cursor = Server_connect()
     cursor.execute("TRUNCATE TABLE table_vendas;")
-    resultado = cursor.fetchall()
-    print(resultado)
     cursor.close()
-    return resultado
+    return {"Menssage": "successfully cleared table!!!"}
