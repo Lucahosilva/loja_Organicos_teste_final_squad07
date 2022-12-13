@@ -1,11 +1,18 @@
+<<<<<<< HEAD
 from main import app
 import pytest
 
 
+=======
+from relatorio.main import app
+import pytest
+
+>>>>>>> cd6f35baf28c03d75e64dcba7424f0f5245bab7e
 @pytest.fixture()
 def client():
     return app.test_client()
 
+<<<<<<< HEAD
 
 def test_sales(client):
     response = client.get("/sales")
@@ -40,3 +47,8 @@ def test_get_iten(client):
     response = client.get("/get_iten/tomate")
     assert response.status_code == 200 
     assert '{"Menssage": "iten not found"}' not in response.text
+=======
+def test_index(client):
+    response = client.get('/')
+    assert response.status_code == 200
+>>>>>>> cd6f35baf28c03d75e64dcba7424f0f5245bab7e

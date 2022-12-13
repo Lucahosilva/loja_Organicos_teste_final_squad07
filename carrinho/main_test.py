@@ -2,10 +2,10 @@ import pytest
 import requests
 from main import app
 
+
 @pytest.fixture()
 def client():
     return app.test_client()
-
 
 #Rotas para Home
 def test_home_status_code(client):
@@ -26,21 +26,21 @@ def test_criar_tabela_return_content(client):
     assert resultado.json == {'Tabela':'criada'}
 
 #Rotas para consulta tabela
-def test_consulta_tabela_status_code(client):
-    resultado = client.get('/consulta')
+def test_listar_produtos_status_code(client):
+    resultado = client.get('/listar')
     assert resultado.status_code == 200
 
-def test_consulta_tabela_(client): # TESTE TABELA VAZIO
-    resultado = client.get('/consulta')
+def test_listar_produtos(client): # TESTE TABELA VAZIO
+    resultado = client.get('/listar')
     assert resultado.status_code == 204 # No Content - deve dar negativo pois a tabela esta criada / oque tu acha lucas
 
 #Rotas para consulta por ID
-def test_consulta_id_status_code(client):
-    resultado = client.get('/consulta/<-1>')
+def test_listar_produto_id_status_code(client):
+    resultado = client.get('/listar/<-1>')
     assert resultado.status_code == 200
 
-def test_consulta_id_return_null(client):
-    resultado = client.get('/consulta/<-1>')
+def test_listar_produto_id_return_null(client):
+    resultado = client.get('/listar/<-1>')
     assert resultado.json == {'Produtos': '[]'}
 
 #Rotas para alimentar_

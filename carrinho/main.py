@@ -3,7 +3,7 @@ from json import dumps
 from flask import Flask
 
 app= Flask(__name__)
-banco = "cart.db"
+banco = "carrinho/cart.db"
 #
 # Comandos SQL
 # contagem = "SELECT COUNT(*) FROM Carrinho;"
@@ -37,19 +37,24 @@ def criar_tabela():
     fechar_conexao(conexao)
     return {'Tabela':'criada'}, 201
 
-@app.get('/consulta') # FUNCIONANDO 
-def consulta_tabela():
+@app.get('/listar') # FUNCIONANDO 
+def listar_produtos():
     conexao, cursor = abrir_conexao(banco) # abertura do banco
     resultado = cursor.execute(select_todos).fetchall() 
     fechar_conexao(conexao)
     return {'Produtos': f'{resultado}'}, 200
 
-@app.get('/consulta/<id_prod>') #Funcionando 
-def consulta_id(id_prod):
-    conexao, cursor = abrir_conexao(banco) # abertura do banco
-    resultado = cursor.execute(select_id, [id_prod]).fetchall() 
-    fechar_conexao(conexao)
-    return {'Produtos': f'{resultado}'}, 200
+@app.get('/listar/<id_prod>') #Funcionando 
+def listar_produto(id_prod):
+    try:
+        conexao, cursor = abrir_conexao(banco) # abertura do banco
+        resultado = cursor.execute(select_id, [id_prod]).fetchall() 
+        fechar_conexao(conexao)
+        return {'Produtos': f'{resultado}'}, 200
+    except sql.Error as erro:
+        resultado = erro
+        fechar_conexao(conexao)
+        return (f'Erro ao consultar produto {id_prod}, verificar parametros {resultado}'), 400
 
 @app.put('/atualiza/<id_prod>/<quantidade>') #Funcionando
 def update_quanti(id_prod,quantidade): # /atualiza/2/20
