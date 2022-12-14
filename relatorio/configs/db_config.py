@@ -9,6 +9,6 @@ def Server_connect(dicionario=True):
         )
         if conexao:
             cursor = conexao.cursor(dictionary=dicionario)
-            return conexao, cursor 
+            return conexao, cursor
         else:
             return {"Erro": "Falha de conexão com banco de dados"}
