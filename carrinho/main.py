@@ -3,7 +3,7 @@ from json import dumps
 from flask import Flask
 
 app= Flask(__name__)
-banco = "carrinho/cart.db"
+banco = "cart.db"
 #
 # Comandos SQL
 # contagem = "SELECT COUNT(*) FROM Carrinho;"
