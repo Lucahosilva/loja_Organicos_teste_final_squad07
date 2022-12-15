@@ -15,8 +15,6 @@ delete_id = "DELETE FROM carrinho WHERE id_prod = ?;"
 #inserir_prod = "INSERT INTO Carrinho VALUES (:id,:Nome,:Preco,:Quantidade,:Descrição,);"
 atualiza_prod = "UPDATE carrinho SET quantidade = (quantidade) WHERE id_prod = (id_prod);" 
 
-
-
 def abrir_conexao(banco):
     conexao = sql.connect(banco) #connection to db
     cursor = conexao.cursor() #create a cursor
