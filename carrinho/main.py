@@ -1,16 +1,23 @@
+# Controle de carrinho utilizando SQLite
+# Adição de produtos
+# Remoção de produtos
+# Alteração de quantidade
+# Consulta de itens
+
 import sqlite3 as sql
 from json import dumps
 from flask import Flask
 
 app= Flask(__name__)
+
 banco = "cart.db"
 
 criar_table = "CREATE TABLE IF NOT EXISTS carrinho (id_prod INTEGER PRIMARY KEY, nome TEXT NOT NULL, preco REAL NOT NULL, quantidade INTEGER NOT NULL, desc TEXT NOT NULL);"
 select_todos = "SELECT * FROM carrinho;"
-truncate = "DELETE FROM carrinho;" 
 select_id = "SELECT * FROM carrinho WHERE id_prod like ?;"
-delete_id = "DELETE FROM carrinho WHERE id_prod = ?;"
 atualiza_prod = "UPDATE carrinho SET quantidade = (quantidade) WHERE id_prod = (id_prod);" 
+delete_id = "DELETE FROM carrinho WHERE id_prod = ?;"
+truncate = "DELETE FROM carrinho;" 
 
 def abrir_conexao(banco): # Conectar com o banco
     conexao = sql.connect(banco) 
@@ -31,6 +38,22 @@ def criar_tabela():
     cursor.execute(criar_table)
     fechar_conexao(conexao)
     return {'Tabela':'criada'}, 201
+
+@app.post('/alimentar/<id_prod>/<name>/<value>/<quantity>/<desc>') # Adicionar produto 
+def alimentar_tabela(id_prod, name, value, quantity, desc): # /alimentar/1/Carro/10.50/1/1.0 sem Ar
+    try:
+        conexao, cursor = abrir_conexao(banco)
+        data = [
+        (id_prod,name,value,quantity,desc)
+        ]
+        cursor.executemany('INSERT INTO carrinho VALUES(?,?,?,?,?)', data)
+        resultado = cursor.execute(select_todos)
+        fechar_conexao(conexao)
+        return(f"{name} Cadastrado com sucesso") , 202
+    except sql.Error as erro:
+        resultado = erro
+        fechar_conexao(conexao)
+        return (f'Erro ao adicionar produto(s), verificar parametros {resultado}'), 400
 
 @app.get('/listar') # Listar produtos cadastrados 
 def listar_produtos():
@@ -71,22 +94,6 @@ def deleta_id(id_prod):
     cursor.execute(delete_id, [id_prod])
     fechar_conexao(conexao)
     return {'Mensagem': f'Produto ID {id_prod} deletado com sucesso'}, 200
-   
-@app.post('/alimentar/<id_prod>/<name>/<value>/<quantity>/<desc>') # Adicionar produto 
-def alimentar_tabela(id_prod, name, value, quantity, desc): # /alimentar/1/Carro/10.50/1/1.0 sem Ar
-    try:
-        conexao, cursor = abrir_conexao(banco)
-        data = [
-        (id_prod,name,value,quantity,desc)
-        ]
-        cursor.executemany('INSERT INTO carrinho VALUES(?,?,?,?,?)', data)
-        resultado = cursor.execute(select_todos)
-        fechar_conexao(conexao)
-        return(f"{name} Cadastrado com sucesso") , 202
-    except sql.Error as erro:
-        resultado = erro
-        fechar_conexao(conexao)
-        return (f'Erro ao adicionar produto(s), verificar parametros {resultado}'), 400
 
 if __name__ == '__main__':
     app.run(debug=True, port=8000)
