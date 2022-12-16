@@ -6,79 +6,66 @@ from carrinho.main import app
 def client():
     return app.test_client()
 
-
-# Rotas para Home
+#Rotas para Home
 def test_home_status_code(client):
-    resultado = client.get("/")
+    resultado = client.get('/')
     assert resultado.status_code == 200
-
 
 def test_home_text_content(client):
-    resultado = client.get("/")
-    assert resultado.text == "SEJA BEM VINDO(A) A API ORGANICOS "
+    resultado = client.get('/')
+    assert resultado.text == 'SEJA BEM VINDO(A) A API ORGANICOS '
 
-
-# Rotas para criar tabela
+#Rotas para criar tabela
 def test_criar_tabela_status_code(client):
-    resultado = client.post("/criar_tabela")
+    resultado = client.post('/criar_tabela')
     assert resultado.status_code == 201
 
-
 def test_criar_tabela_return_content(client):
-    resultado = client.post("/criar_tabela")
-    assert resultado.json == {"Tabela": "criada"}
+    resultado = client.post('/criar_tabela')
+    assert resultado.json == {'Tabela':'criada'}
 
-
-# Rotas para consulta tabela
+#Rotas para consulta tabela
 def test_listar_produtos_status_code(client):
-    resultado = client.get("/listar")
+    resultado = client.get('/listar')
     assert resultado.status_code == 200
 
+def test_listar_produtos(client): # TESTE TABELA VAZIO
+    resultado = client.get('/listar')
+    assert resultado.status_code == 200 # No Content - deve dar negativo pois a tabela esta criada / oque tu acha lucas
 
-def test_listar_produtos(client):  # TESTE TABELA VAZIO
-    resultado = client.get("/listar")
-    assert (resultado.status_code == 200)  # No Content - deve dar negativo pois a tabela esta criada / oque tu acha lucas
-
-
-# Rotas para consulta por ID
+#Rotas para consulta por ID
 def test_listar_produto_id_status_code(client):
-    resultado = client.get("/listar/<-1>")
+    resultado = client.get('/listar/<-1>')
     assert resultado.status_code == 200
-
 
 def test_listar_produto_id_return_null(client):
-    resultado = client.get("/listar/<-1>")
-    assert resultado.json == {"Produtos": "[]"}
+    resultado = client.get('/listar/<-1>')
+    assert resultado.json == {'Produtos': '[]'}
 
-
-# Rotas para alimentar_
+#Rotas para alimentar_
 def test_alimentar_status_code(client):
-    resultado = client.post("/alimentar/1/Carro/10.50/1/automatico")
+    resultado = client.post('/alimentar/1/Carro/10.50/1/automatico')
     assert resultado.status_code == 202
 
-
 def test_alimentar_(client):
-    resultado = client.post("/alimentar/2/Banana/5.5/1/Da Jamaica")
+    resultado = client.post('/alimentar/2/Banana/5.5/1/Da Jamaica')
     assert resultado.text == ("Banana Cadastrado com sucesso")
 
-
-# Rotas para deletar por ID
+#Rotas para deletar por ID
 def test_delete_id_status_code(client):
-    resultado = client.delete("deletar/1")
+    resultado = client.delete('deletar/1')
     assert resultado.status_code == 200
 
-
 def test_delete_id_status_code(client):
-    resultado = client.delete("deletar/2")
-    assert resultado.json == {"Mensagem": f"Produto ID 2 deletado com sucesso"}
+    resultado = client.delete('deletar/2')
+    assert resultado.json == {'Mensagem': f'Produto ID 2 deletado com sucesso'}
 
-
-# Rotas para Truncate
+#Rotas para Truncate 
 def test_truncate_status_code(client):
-    resultado = client.delete("/deletar")
+    resultado = client.delete('/deletar')  
     assert resultado.status_code == 200
-
-
+     
 def test_truncate_message(client):
-    resultado = client.delete("/deletar")
-    assert resultado.json == {"message": "Carrinho apagado!"}
+    resultado = client.delete('/deletar')  
+    assert resultado.json == {'message': 'Carrinho apagado!'}
+
