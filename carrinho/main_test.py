@@ -2,7 +2,6 @@ import pytest
 import requests
 from carrinho.main import app
 
-
 @pytest.fixture()
 def client():
     return app.test_client()
